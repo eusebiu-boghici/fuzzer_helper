@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fuzzer Command Line Builder</title>
     <link rel="stylesheet" href="styles.css">
 </head>
+
 <body>
     <div class="container">
         <div class="input-section">
@@ -13,26 +15,35 @@
             <form id="inputForm">
                 <!-- Dynamically generated inputs will appear here -->
             </form>
+            <button id="saveButton" onclick="saveToLocalStorage()">Save to LocalStorage</button>
+            <button id="clearButton" onclick="localStorage.clear()">Clear LocalStorage</button>
         </div>
         <div class="output-section">
             <h2>Command Outputs:</h2>
             <div class="command-container">
-                <h3>Feroxbuster:</h3>
-                <pre id="feroxbusterOutput"></pre>
+                <div class="command-content">
+                    <h3>Feroxbuster:</h3>
+                    <pre id="feroxbusterOutput"></pre>
+                </div>
                 <button class="copy-icon" onclick="copyToClipboard('feroxbusterOutput')">📋</button>
             </div>
             <div class="command-container">
-                <h3>Wfuzz:</h3>
-                <pre id="wfuzzOutput"></pre>
+                <div class="command-content">
+                    <h3>wfuzz:</h3>
+                    <pre id="wfuzzOutput"></pre>
+                </div>
                 <button class="copy-icon" onclick="copyToClipboard('wfuzzOutput')">📋</button>
             </div>
             <div class="command-container">
-                <h3>FFUF:</h3>
-                <pre id="ffufOutput"></pre>
+                <div class="command-content">
+                    <h3>ffuf:</h3>
+                    <pre id="ffufOutput"></pre>
+                </div>
                 <button class="copy-icon" onclick="copyToClipboard('ffufOutput')">📋</button>
             </div>
         </div>
     </div>
     <script src="script.js"></script>
 </body>
+
 </html>

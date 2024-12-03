@@ -1,27 +1,56 @@
-body { font-family: Arial, sans-serif; }
+body {
+    font-family: Arial, sans-serif;
+}
+
 .container {
     display: flex;
-    gap: 20px; /* Add some space between sections */
+    gap: 20px;
+    /* Add some space between sections */
 }
-.input-section, .output-section {
-    flex: 1; /* Make each section take up equal space */
-}
-.input-section {
-    padding-right: 10px; /* Add padding to separate input visually */
-}
+
+.input-section,
 .output-section {
-    padding-left: 10px; /* Add padding to separate output visually */
+    flex: 1;
+    /* Make each section take up equal space */
 }
-input, select {
+
+.input-section {
+    padding-right: 10px;
+    /* Add padding to separate input visually */
+}
+
+.output-section {
+    padding-left: 10px;
+    /* Add padding to separate output visually */
+}
+
+input,
+select {
     width: 100%;
     margin: 10px 0;
     padding: 10px;
 }
+
 .command-container {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
+    flex-direction: row;
+    /* Ensure the button and group are horizontally aligned */
+    align-items: flex-start;
+    /* Align items at the start of the container */
+    gap: 10px;
+    /* Add some space between the button and the text group */
 }
+
+.command-content {
+    display: flex;
+    flex-direction: column;
+    /* Stack <h3> and <pre> vertically */
+    gap: 5px;
+    /* Space between <h3> and <pre> */
+    flex-grow: 1;
+    /* Make this content take up as much space as possible */
+}
+
 pre {
     background: #f4f4f4;
     padding: 10px;
@@ -29,9 +58,9 @@ pre {
     border-radius: 5px;
     overflow-wrap: break-word;
     white-space: pre-wrap;
-    flex: 1;
     margin: 0;
 }
+
 .copy-icon {
     background: none;
     border: none;

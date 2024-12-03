@@ -4,7 +4,8 @@ const argumentsList = [
     { id: 'userAgent', label: 'User-Agent', type: 'text', placeholder: 'User-Agent string', value: 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/109.0' },
     { id: 'threads', label: 'Threads', type: 'number', placeholder: 'Number of threads', value: 10 },
     { id: 'wordlist', label: 'Wordlist', type: 'text', placeholder: 'Enter wordlist path', value: '/usr/share/seclists/Discovery/Web-Content/raft-medium-directories.txt' },
-    { id: 'outputFile', label: 'Output File Name', type: 'text', placeholder: 'Enter output file name', value: 'raft-medium-dirs' }
+    { id: 'outputFile', label: 'Output File Name', type: 'text', placeholder: 'Enter output file name', value: 'raft-medium-dirs' },
+    { id: 'proxy', label: 'Proxy', type: 'text', placeholder: 'http://localhost:8080', value: '' }
 ];
 
 // Function to dynamically create input fields based on argumentsList
@@ -20,8 +21,7 @@ function generateInputs() {
         input.setAttribute('type', arg.type);
         input.setAttribute('id', arg.id);
         input.setAttribute('placeholder', arg.placeholder);
-        input.setAttribute('value', arg.value);
-        input.setAttribute('required', true);
+        input.setAttribute('value', localStorage.getItem(arg.id) || arg.value);  // Load from localStorage if available
         input.oninput = updateCommands;
         div.appendChild(label);
         div.appendChild(input);
@@ -29,42 +29,87 @@ function generateInputs() {
     });
 }
 
+// Function to save input field values to localStorage
+function saveToLocalStorage() {
+    argumentsList.forEach(arg => {
+        const value = document.getElementById(arg.id).value;
+        localStorage.setItem(arg.id, value);  // Save each input field value to localStorage
+    });
+}
+
 // Function to update commands
 function updateCommands() {
-    const args = argumentsList.reduce((acc, arg) => {
-        acc[arg.id] = document.getElementById(arg.id).value;
-        return acc;
-    }, {});
-
-    const { url, wordlist, threads, userAgent, outputFile } = args;
+    const url = document.getElementById('url').value;
+    const wordlist = document.getElementById('wordlist').value;
+    const threads = document.getElementById('threads').value;
+    const userAgent = document.getElementById('userAgent').value;
+    const outputFileBase = document.getElementById('outputFile').value;
+    const proxy = document.getElementById('proxy').value;
 
     // Parse the output file for each tool
-    const feroxbusterOutputFile = `${outputFile}.feroxbuster`;
-    const wfuzzOutputFile = `${outputFile}.wfuzz`;
-    const ffufOutputFile = `${outputFile}.ffuf`;
+    const feroxbusterOutputFile = `${outputFileBase}.feroxbuster`;
+    const wfuzzOutputFile = `${outputFileBase}.wfuzz`;
+    const ffufOutputFile = `${outputFileBase}.ffuf`;
 
-    // Build Feroxbuster command
-    const feroxbusterCommand = `feroxbuster -u ${url} -w ${wordlist} -t ${threads} --user-agent "${userAgent}" -o ${feroxbusterOutputFile}`;
+    // Build Feroxbuster command with multiline template
+    const feroxbusterCommandParts = [
+        `feroxbuster`,
+        `--wordlist ${wordlist}`,
+        `--threads ${threads}`,
+        `--user-agent "${userAgent}"`,
+        `--output ${feroxbusterOutputFile}`,
+        `${proxy ? `--proxy ${proxy} --insecure` : ''}`,
+        `--url ${url}`
+    ].filter(part => part); // Filter out any empty strings
+
+    const feroxbusterCommand = feroxbusterCommandParts.join(' \\\n');
+
     document.getElementById('feroxbusterOutput').textContent = feroxbusterCommand;
 
-    // Build Wfuzz command
-    const wfuzzCommand = `wfuzz -c -z file,${wordlist} -u ${url}/FUZZ -t ${threads} -H "User-Agent: ${userAgent}" -o ${wfuzzOutputFile}`;
+    // Build wfuzz command with multiline template
+    const wfuzzCommandParts = [
+        `wfuzz`,
+        `-c`,
+        `-z file,${wordlist}`,
+        `-t ${threads}`,
+        `-H "User-Agent: ${userAgent}"`,
+        `-f ${wfuzzOutputFile}`,
+        `${proxy ? `-p ${proxy}` : ''}`, // Include proxy only if set
+        `-u ${url}/FUZZ`
+    ].filter(part => part); // Filter out any empty strings
+
+    const wfuzzCommand = wfuzzCommandParts.join(' \\\n');
+
     document.getElementById('wfuzzOutput').textContent = wfuzzCommand;
 
-    // Build FFUF command
-    const ffufCommand = `ffuf -u ${url}/FUZZ -w ${wordlist} -t ${threads} -H "User-Agent: ${userAgent}" -o ${ffufOutputFile}`;
+    // Build ffuf command with multiline template
+    const ffufCommandParts = [
+        `ffuf`,
+        `-w ${wordlist}`,
+        `-t ${threads}`,
+        `-H "User-Agent: ${userAgent}"`,
+        `-o ${ffufOutputFile}`,
+        `${proxy ? `-x ${proxy}` : ''}`, // Include proxy only if set
+        `-u ${url}/FUZZ`
+    ].filter(part => part); // No proxy to filter here
+
+    const ffufCommand = ffufCommandParts.join(' \\\n');
+
+
     document.getElementById('ffufOutput').textContent = ffufCommand;
 }
+
 
 // Function to copy command to clipboard
 function copyToClipboard(elementId) {
     const text = document.getElementById(elementId).textContent;
     navigator.clipboard.writeText(text).then(() => {
-        alert('Command copied to clipboard!');
     }).catch(err => {
         console.error('Failed to copy: ', err);
     });
 }
 
-// Initialize inputs when the page loads
-window.onload = generateInputs;
+window.onload = function () {
+    generateInputs();
+    updateCommands();
+};
