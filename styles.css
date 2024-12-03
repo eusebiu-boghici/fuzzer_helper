@@ -1,0 +1,39 @@
+body { font-family: Arial, sans-serif; }
+.container {
+    display: flex;
+    gap: 20px; /* Add some space between sections */
+}
+.input-section, .output-section {
+    flex: 1; /* Make each section take up equal space */
+}
+.input-section {
+    padding-right: 10px; /* Add padding to separate input visually */
+}
+.output-section {
+    padding-left: 10px; /* Add padding to separate output visually */
+}
+input, select {
+    width: 100%;
+    margin: 10px 0;
+    padding: 10px;
+}
+.command-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+pre {
+    background: #f4f4f4;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    overflow-wrap: break-word;
+    white-space: pre-wrap;
+    flex: 1;
+    margin: 0;
+}
+.copy-icon {
+    background: none;
+    border: none;
+    color: #2cbe4e;
+}
