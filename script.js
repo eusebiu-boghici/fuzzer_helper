@@ -67,6 +67,7 @@ function updateCommands() {
     document.getElementById('feroxbusterOutput').textContent = feroxbusterCommand;
 
     // Build wfuzz command with multiline template
+    const wfuzzProxy = `${proxy.split('://')[1]}:${proxy.split('://')[0].toUpperCase()}`
     const wfuzzCommandParts = [
         `wfuzz`,
         `-c`,
@@ -74,7 +75,7 @@ function updateCommands() {
         `-t ${threads}`,
         `-H "User-Agent: ${userAgent}"`,
         `-f ${wfuzzOutputFile}`,
-        `${proxy ? `-p ${proxy}` : ''}`, // Include proxy only if set
+        `${proxy ? `-p ${wfuzzProxy}` : ''}`, // Include proxy only if set
         `-u ${url}/FUZZ`
     ].filter(part => part); // Filter out any empty strings
 
